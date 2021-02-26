@@ -1,0 +1,5 @@
+<div class="uk-margin" uk-grid>
+    <div *ngFor="let sliderAnimation of sliderAnimations">
+        <img src="/Pictures/apps/slider-editor/{{sliderAnimation.fileName}}" alt="" (click)="animation_click(sliderAnimation)" class="sonet-adminSelect-thumb uk-preserve-width" [class.sonet-adminSelect-thumb-selected]="sliderAnimation == selectedAnimation">
+    </div>
+</div>

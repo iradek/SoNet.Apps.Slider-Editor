@@ -1,0 +1,85 @@
+<div class="uk-padding@m">
+    <form [formGroup]="editSliderForm" class="uk-form-stacked">
+        <fieldset class="sonet-Fieldset">
+
+            <!-- Form Name -->
+            <legend class="sonet-Legend">Edit Slider</legend>
+
+            <!-- State -->
+            <div class="uk-margin">
+                <label class="uk-form-label" for="Enabled">State:</label>
+                <div class="uk-form-controls">
+                    <label class="uk-margin-small-right">
+                        <input type="radio" class="uk-radio" name="Disabled" formControlName="Disabled"
+                            [value]="false">Enabled</label>
+                    <label>
+                        <input type="radio" class="uk-radio" name="Disabled" formControlName="Disabled"
+                            [value]="true">Disabled</label>
+                </div>
+            </div>
+            <!-- Interval-->
+            <div class="uk-margin">
+                <label class="uk-form-label" for="Interval">Interval:</label>
+                <div class="uk-form-controls">
+                    <div class="input-group">
+                        <input id="txtInterval" class="uk-input uk-form-width-xsmall" placeholder=""
+                            formControlName="Interval" type="text" required> seconds
+                    </div>
+                    <span class="uk-text-muted uk-text-small">For how long each slide is displayed</span>
+                </div>
+                <sonet-validation-message [control]="editSliderForm?.controls['Interval']"></sonet-validation-message>
+            </div>
+            <!-- Previous/Next -->
+            <div class="uk-margin">
+                <label class="uk-form-label" for="ShowPrevNext">Previous/Next:</label>
+                <div class="uk-form-controls">
+                    <label class="uk-margin-small-right">
+                        <input type="radio" class="uk-radio" name="ShowPrevNext" [value]="true"
+                            formControlName="ShowPrevNext">Show</label>
+                    <label>
+                        <input type="radio" class="uk-radio" name="ShowPrevNext" [value]="false"
+                            formControlName="ShowPrevNext">Hide</label>
+                </div>
+            </div>
+
+            <!-- Slide Indicators -->
+            <div class="uk-margin">
+                <label class="uk-form-label" for="ShowSlideIndicators">Slide Indicators:</label>
+                <div class="uk-form-controls">
+                    <label class="uk-margin-small-right">
+                        <input type="radio" class="uk-radio" name="ShowSlideIndicators" [value]="true"
+                            formControlName="ShowSlideIndicators">Show</label>
+                    <label>
+                        <input type="radio" class="uk-radio" name="ShowSlideIndicators" [value]="false"
+                            formControlName="ShowSlideIndicators">Hide</label>
+                </div>
+            </div>
+
+            <!-- Height-->
+            <div class="uk-margin">
+                <label class="uk-form-label" for="Height">Height:</label>
+                <div class="uk-form-controls">
+                    <div>
+                        <input id="txtHeight" class="uk-input uk-form-width-small" placeholder=""
+                            formControlName="Height" type="text" required> px
+                    </div>
+                </div>
+            </div>
+            <sonet-validation-message [control]="editSliderForm!.controls['Height']"></sonet-validation-message>
+
+            <!-- Slide Indicators -->
+            <div class="uk-margin">
+                <label class="uk-form-label" for="IsMinHeight">Height Behavior:</label>
+                <div class="uk-form-controls">
+                    <label class="uk-margin-small-right">
+                        <input type="radio" class="uk-radio" name="IsMinHeight" [value]="false"
+                            formControlName="IsMinHeight">This is a maximum height</label>
+                    <label>
+                        <input type="radio" class="uk-radio" name="IsMinHeight" [value]="true"
+                            formControlName="IsMinHeight">This is a minimum height</label>
+                </div>
+            </div>
+
+        </fieldset>
+    </form>
+</div>

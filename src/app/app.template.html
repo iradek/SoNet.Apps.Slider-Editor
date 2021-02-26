@@ -1,0 +1,30 @@
+﻿<div #slideEditor class="sonet-app-container">
+    <sonet-busy-indicator></sonet-busy-indicator>
+    <p-accordion>
+        <p-accordionTab [class.invalid-slide-item]="!editSliderItem.valid"
+            *ngFor="let sliderItem of currentSlider.SliderItemList; let i = index; trackBy:trackSliderItem">
+            <p-header>
+                <i class="fa fa-window-maximize" aria-hidden="true"></i> <span #accordionHeader>Slide #{{i+1}}</span>
+            </p-header>
+            <div style="text-align:right;">
+                <a href="#" class="uk-button uk-button-danger" (click)="deleteSliderItem(i)"><i
+                        class="fa fa-minus-circle" aria-hidden="true"></i> Delete This Slide</a>
+            </div>
+            <sonet-edit-slider-item #editSliderItem [sliderItem]="sliderItem" [(slider)]="currentSlider">
+            </sonet-edit-slider-item>
+        </p-accordionTab>
+        <p-accordionTab [selected]="false">
+            <p-header><i class="fa fa-cogs"></i> General Slider Preferences</p-header>
+            <sonet-editSlider [sliderItemList]="currentSlider?.SliderItemList" #editSlider></sonet-editSlider>
+        </p-accordionTab>
+    </p-accordion>
+
+    <div class="uk-text-right">
+        <a (click)="addNewSliderItem()" class="uk-button uk-button-secondary" href="#"><i class="fa fa-plus-circle"
+                aria-hidden="true"></i> Add New Slide</a>
+    </div>
+    <!-- <div class="uk-text-center uk-margin">
+        <a class="uk-button sonet-Button-save uk-width-1-1 uk-width-auto@m" [class.disabled]="!canSave"
+            (click)="saveSlider()"><i class="fa fa-floppy-o"></i> Save Slider</a>
+    </div> -->
+</div>

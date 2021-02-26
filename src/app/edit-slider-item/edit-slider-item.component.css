@@ -1,0 +1,20 @@
+fieldset { margin: 0 !important; }
+
+#custom-input { display: inline-block; margin: 1em 0 0 0; }
+
+.sonet-slider-image {
+    position: relative;
+}
+.sonet-slider-overlay { 
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #080d15;
+}
+
+.sonet-slider-static {
+    font-weight: 600;
+}
+
