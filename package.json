@@ -20,10 +20,11 @@
     "@angular/platform-browser": "~11.2.3",
     "@angular/platform-browser-dynamic": "~11.2.3",
     "@angular/router": "~11.2.3",
-    "@iradek/sonet-appskit": "^1.0.7",
+    "@iradek/sonet-appskit": "^1.0.9",
     "primeng": "^11.2.3",
     "rxjs": "~6.6.0",
     "tslib": "^2.0.0",
+    "uikit": "^3.6.17",
     "zone.js": "~0.11.3"
   },
   "devDependencies": {
