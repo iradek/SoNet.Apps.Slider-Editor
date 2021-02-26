@@ -21,6 +21,7 @@
     "@angular/platform-browser-dynamic": "~11.2.3",
     "@angular/router": "~11.2.3",
     "@iradek/sonet-appskit": "^1.0.9",
+    "font-awesome": "^4.7.0",
     "primeng": "^11.2.3",
     "rxjs": "~6.6.0",
     "tslib": "^2.0.0",

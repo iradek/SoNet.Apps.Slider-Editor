@@ -4,7 +4,7 @@
         <p-accordionTab [class.invalid-slide-item]="!editSliderItem.valid"
             *ngFor="let sliderItem of currentSlider.SliderItemList; let i = index; trackBy:trackSliderItem">
             <p-header>
-                <i class="fa fa-window-maximize" aria-hidden="true"></i> <span #accordionHeader>Slide #{{i+1}}</span>
+                <i class="fa fa-window-maximize" aria-hidden="true"></i>&nbsp;<span #accordionHeader>Slide #{{i+1}}</span>
             </p-header>
             <div style="text-align:right;">
                 <a href="#" class="uk-button uk-button-danger" (click)="deleteSliderItem(i)"><i
@@ -23,8 +23,8 @@
         <a (click)="addNewSliderItem()" class="uk-button uk-button-secondary" href="#"><i class="fa fa-plus-circle"
                 aria-hidden="true"></i> Add New Slide</a>
     </div>
-    <!-- <div class="uk-text-center uk-margin">
-        <a class="uk-button sonet-Button-save uk-width-1-1 uk-width-auto@m" [class.disabled]="!canSave"
+    <div class="uk-text-center uk-margin">
+        <a class="uk-button uk-button-primary uk-width-1-1 uk-width-auto@m" [class.disabled]="!canSave"
             (click)="saveSlider()"><i class="fa fa-floppy-o"></i> Save Slider</a>
-    </div> -->
+    </div>
 </div>
