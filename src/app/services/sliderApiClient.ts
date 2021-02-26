@@ -12,13 +12,13 @@ export class SliderApiClient extends SoNetApiClient {
     }
 
     async getCurrentSliderAsync(): Promise<Slider> {
-        return await this.soNetProxy.get<Slider>(`/api/SliderObjects/GetCurrent?excludeTemplateSlider=false&excludeDefaultSlider=true`).toPromise();
+        return await this.soNetProxy.get$<Slider>(`/api/SliderObjects/GetCurrent?excludeTemplateSlider=false&excludeDefaultSlider=true`).toPromise();
     }
 
     async getSliderAsync(sliderID: string): Promise<Slider> {
         if (!sliderID)
             throw new Error("Invalid sliderID");
-        return await this.soNetProxy.get<Slider>(`/odata/Sliders(${sliderID})?$expand=SliderItemList`).toPromise();
+        return await this.soNetProxy.get$<Slider>(`/odata/Sliders(${sliderID})?$expand=SliderItemList`).toPromise();
     }
 
     async saveSliderAsync(slider: Slider): Promise<Slider> {
@@ -26,7 +26,7 @@ export class SliderApiClient extends SoNetApiClient {
             throw new Error("Invalid Slider to save.");
         const clonedSlider = this.ensureProperties({ ...slider }); //clone to save original with its SliderItemList that is normally deleted after
         delete clonedSlider.SliderItemList;
-        return await this.soNetProxy.post<Slider>("/odata/Sliders", clonedSlider).toPromise();
+        return await this.soNetProxy.post$<Slider>("/odata/Sliders", clonedSlider).toPromise();
     }
 
     async updateSliderAsync(slider: Slider): Promise<Slider> {
@@ -36,7 +36,7 @@ export class SliderApiClient extends SoNetApiClient {
             throw new Error("Slider does not have SliderID therefore does not qualify to be updated.");
         const clonedSlider = this.ensureProperties({ ...slider }); //clone to save original with its SliderItemList that is normally deleted after
         delete clonedSlider.SliderItemList;
-        return await this.soNetProxy.put<Slider>(`/odata/Sliders(${slider.SliderID})`, clonedSlider).toPromise();
+        return await this.soNetProxy.put$<Slider>(`/odata/Sliders(${slider.SliderID})`, clonedSlider).toPromise();
     }
 
     async saveOrUpdateSliderAsync(slider: Slider): Promise<Slider> {
@@ -61,13 +61,13 @@ export class SliderApiClient extends SoNetApiClient {
             throw new Error("Invalid sliderID while saving Slide for Site");
         let url = `/odata/Sites('${siteName}')`;
         let body = { "SliderID": sliderID };
-        return await this.soNetProxy.patch(url, body).toPromise();
+        return await this.soNetProxy.patch$(url, body).toPromise();
     }
 
     async saveSliderItemAsync(sliderItem: SliderItem): Promise<SliderItem> {
         if (!sliderItem)
             throw new Error("Invalid SliderItem to save.");
-        return await this.soNetProxy.post<SliderItem>("/odata/SliderItems", this.ensureProperties(sliderItem)).toPromise();
+        return await this.soNetProxy.post$<SliderItem>("/odata/SliderItems", this.ensureProperties(sliderItem)).toPromise();
     }
 
     async updateSliderItemAsync(sliderItem: SliderItem): Promise<SliderItem> {
@@ -76,7 +76,7 @@ export class SliderApiClient extends SoNetApiClient {
         if (!sliderItem.SliderItemID)
             throw new Error("SliderItem does not have a valid SliderItemID therefore does not qualify to be updated");
 
-        return await this.soNetProxy.put<SliderItem>(`/odata/SliderItems(${sliderItem.SliderItemID})`, this.ensureProperties(sliderItem)).toPromise();
+        return await this.soNetProxy.put$<SliderItem>(`/odata/SliderItems(${sliderItem.SliderItemID})`, this.ensureProperties(sliderItem)).toPromise();
     }
 
     async saveOrUpdateSliderItemAsync(sliderItem: SliderItem): Promise<SliderItem> {
@@ -95,7 +95,7 @@ export class SliderApiClient extends SoNetApiClient {
         let formData: FormData = new FormData();
         formData.append("file", imageBlob, "slideimage");
         formData.append("SiteName", this.sonetConfigService.config.siteName!);
-        return await this.soNetProxy.post<SliderItem>(url, formData).toPromise();
+        return await this.soNetProxy.post$<SliderItem>(url, formData).toPromise();
     }
 
     async uploadSliderItemVideoAsync(sliderItemID: string, videoDataUri: string): Promise<SliderItem> {
@@ -104,21 +104,21 @@ export class SliderApiClient extends SoNetApiClient {
         let formData: FormData = new FormData();
         formData.append("file", imageBlob, "slideVideo");
         formData.append("SiteName", this.sonetConfigService.config.siteName!);
-        return await this.soNetProxy.post<SliderItem>(url, formData).toPromise();
+        return await this.soNetProxy.post$<SliderItem>(url, formData).toPromise();
     }
 
     async deleteSliderItemAsync(sliderItemID: string): Promise<SliderItem> {
         if (!sliderItemID)
             throw new Error("Invalid SliderItemID while deleting SliderItem");
         let url = `/odata/SliderItems(${sliderItemID})`;
-        return await this.soNetProxy.delete<SliderItem>(url).toPromise();
+        return await this.soNetProxy.delete$<SliderItem>(url).toPromise();
     }
 
     async isSliderVideoProcessing(sliderItemID: string) {
         if (!sliderItemID)
             throw new Error("Invalid SliderItemID while checking SliderItem video processing status");
         let url = `/api/ObjectJobs/GetJobState?objectID=${sliderItemID}&objectTypeName=MediaLibrarianCore.SliderItem`;
-        const jobState = await this.soNetProxy.get<string>(url).toPromise();
+        const jobState = await this.soNetProxy.get$<string>(url).toPromise();
         if (!jobState)
             return false;
         return jobState !== "Unknown" && jobState !== "Succeeded";

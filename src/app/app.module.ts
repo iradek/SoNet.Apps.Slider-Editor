@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AnimSelectorComponent } from './anim-selector/anim-selector.component';
 
 import { AppComponent } from './app.component';
@@ -19,13 +20,14 @@ import { UtilsService } from './services/utils.service';
   declarations: [AppComponent, EditSlider, EditSliderItemComponent, AnimSelectorComponent],
   imports: [
     BrowserModule,    
+    BrowserAnimationsModule,
     FormsModule,
     ReactiveFormsModule,
     SoNetAppsKitModule, 
     SharedModule,       
     AccordionModule,    
     ToastModule,
-    SliderModule
+    SliderModule    
   ],
   providers: [SliderApiClient, UtilsService, MessageService],
   bootstrap: [AppComponent]

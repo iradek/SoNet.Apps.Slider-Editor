@@ -47,7 +47,7 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
     get overlayStyleControl() { return this.editSliderItemForm ? this.editSliderItemForm.get("OverlayStyle") : null; };
     get buttonUrlControl() { return this.editSliderItemForm ? this.editSliderItemForm.get("ButtonUrl") : null; };
 
-    @ViewChild("imgContainer") imgContainer?: ElementRef;
+    @ViewChild("imgContainer", { static: true }) imgContainer: ElementRef;
 
     @Input()
     set sliderItem(value: SliderItem) {
