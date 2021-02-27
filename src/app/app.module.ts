@@ -12,9 +12,10 @@ import { AccordionModule } from "primeng/accordion";
 import { ToastModule } from "primeng/toast";
 import { SliderModule } from 'primeng/slider';
 import { MessageService, SharedModule } from 'primeng/api';
-import { SoNetAppsKitModule } from '@iradek/sonet-appskit';
+import { SoNetAppsKitModule, SoNetConfigService } from '@iradek/sonet-appskit';
 import { SliderApiClient } from './services/sliderApiClient';
 import { UtilsService } from './services/utils.service';
+import { SoNetAppConfig } from './sonetapp.config';
 
 @NgModule({
   declarations: [AppComponent, EditSlider, EditSliderItemComponent, AnimSelectorComponent],
@@ -29,7 +30,12 @@ import { UtilsService } from './services/utils.service';
     ToastModule,
     SliderModule    
   ],
-  providers: [SliderApiClient, UtilsService, MessageService],
+  providers: [SliderApiClient, UtilsService, MessageService,
+    {
+      provide: SoNetConfigService,
+      useClass: SoNetAppConfig
+    }
+  ],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class SliderEditorAppModule { }
