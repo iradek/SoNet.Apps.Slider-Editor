@@ -15,4 +15,5 @@ Make sure you use `"oAuthGrant":"ResourceOwner` and put valid:
 
 # Run
 ```
-ng s
+$ npm install
+$ ng s
