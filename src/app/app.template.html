@@ -1,5 +1,6 @@
 ﻿<div #slideEditor class="sonet-app-container">
     <sonet-busy-indicator></sonet-busy-indicator>
+    <p-toast position="top-right"></p-toast>
     <p-accordion>
         <p-accordionTab [class.invalid-slide-item]="!editSliderItem.valid"
             *ngFor="let sliderItem of currentSlider.SliderItemList; let i = index; trackBy:trackSliderItem">

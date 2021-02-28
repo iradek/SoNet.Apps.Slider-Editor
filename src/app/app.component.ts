@@ -5,6 +5,7 @@ import { Slider } from "./models/slider";
 import { SliderItem } from "./models/sliderItem";
 import { EditSliderItemComponent } from "./edit-slider-item/edit-slider-item.component";
 import { MessageService } from 'primeng/api';
+import { SoNetAppConfig } from "./sonetapp.config";
 
 declare var $: any;
 
@@ -31,8 +32,9 @@ export class AppComponent {
         return this.editSliderControl.valid;
     }
 
-    constructor(private apiClient: SliderApiClient, private renderer: Renderer2, private messageService: MessageService) {
-        //this.maxUploadLengthInMegaBytes = this.config["_configFromFile"]["maxUploadLengthInMegaBytes"];
+    constructor(private apiClient: SliderApiClient, private sonetConfig: SoNetAppConfig, private renderer: Renderer2, private messageService: MessageService) {
+        if (this.sonetConfig.config?.maxUploadLengthInMegaBytes)
+            this.maxUploadLengthInMegaBytes = this.sonetConfig.config.maxUploadLengthInMegaBytes;
     }
 
     async ngOnInit() {
