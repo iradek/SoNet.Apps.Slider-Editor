@@ -34,4 +34,10 @@ export class AnimSelectorComponent implements OnInit {
         this.animationSelectedEvent.emit(animation);
     }
 
+    getImagePath(sliderAnimation: SlideAnimation) {
+        if (!sliderAnimation)
+            return;
+        return `/Pictures/apps/slider-editor/${sliderAnimation.fileName}`;
+    }
+
 }
