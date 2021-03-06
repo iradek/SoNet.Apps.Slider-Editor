@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter, Input, ViewChild, ElementRef, OnDestroy } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, Input, ViewChild, ElementRef, OnDestroy, OnChanges, SimpleChanges } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { SliderItem } from "../models/sliderItem";
 import { Slider } from "../models/slider";
@@ -26,8 +26,9 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
     defaultHeight: number = 300;
     editSliderItemForm?: FormGroup;
     additionalProperties = {
-        uriSchema: "http://",
+        uriSchema: "https://",
         opacityValue: (this.defaultOpacity * 100),
+        buttonBody: "",
         get finalOpacity(): number {
             return this.opacityValue / 100;
         },
@@ -35,6 +36,8 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
             this.opacityValue = value * 100;
         }
     };
+
+    txtButtonUrl_placeholder = this.resolveSchemaPlaceholder(this.additionalProperties.uriSchema);
     /**
      * When true - it contains an image or video that needs to be uploaded.
      */
@@ -42,7 +45,8 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
 
     get opacityCSS(): string { return `;background-color: rgba(34,34,34, ${this.additionalProperties.finalOpacity});`; }; //must be a property to re-evaluate on each call
     opacityRegex: RegExp = new RegExp(";background-color:\\s+rgba\\(34,34,34,\\s+([0-9]*\\.?[0-9]+)\\);*", "i");
-    prefixRegex: RegExp = new RegExp("^(http[s]*:\\/\\/|tel:)", "i");
+    prefixRegex: RegExp = new RegExp("^(http[s]*:\\/\\/|tel:|sms:)", "i");
+    suffixRegex: RegExp = new RegExp("\\?&body=(.*)", "i");
 
     get overlayStyleControl() { return this.editSliderItemForm ? this.editSliderItemForm.get("OverlayStyle") : null; };
     get buttonUrlControl() { return this.editSliderItemForm ? this.editSliderItemForm.get("ButtonUrl") : null; };
@@ -96,10 +100,13 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
         this.buildForm();
     }
 
+    onSchemaChange(newSchema: string) {
+        this.txtButtonUrl_placeholder = this.resolveSchemaPlaceholder(newSchema);
+    }
+
     ngOnDestroy() {
         this.stopVideoProcessingInterval();
     }
-
 
     private startVideoProcessingInterval() {
         this.videoProcessingInterval = setInterval(async () => await this.checkVideoStatusAsync(this.sliderItem), 2000);
@@ -108,6 +115,14 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
     private stopVideoProcessingInterval() {
         if (this.videoProcessingInterval)
             clearInterval(this.videoProcessingInterval);
+    }
+
+    private resolveSchemaPlaceholder(schema: string) {
+        if (!schema)
+            return "";
+        if (schema === "tel:" || schema === "sms:")
+            return "enter phone number";
+        return "enter url";
     }
 
 
@@ -128,7 +143,7 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
     getSliderItemObject(): SliderItem {
         Object.assign(this.sliderItem, this.editSliderItemForm?.value);
         if (this.buttonUrlControl?.value)
-            this.sliderItem.ButtonUrl = this.additionalProperties.uriSchema + this.buttonUrlControl.value;
+            this.sliderItem.ButtonUrl = this.additionalProperties.uriSchema + this.buttonUrlControl.value + (this.additionalProperties.buttonBody ? "?&body=" + this.additionalProperties.buttonBody : "");
         const additionalOverlayStyle: string = this.overlayStyleControl?.value || "";
         this.sliderItem.OverlayStyle = additionalOverlayStyle + this.opacityCSS;
         //pass back real cropped width
@@ -149,8 +164,13 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
             let match = instance.ButtonUrl.match(this.prefixRegex);
             if (match) {
                 this.additionalProperties.uriSchema = match[1];
-                this.buttonUrlControl!.setValue(instance.ButtonUrl.replace(this.additionalProperties.uriSchema, ""));
-            }
+                this.buttonUrlControl.setValue(instance.ButtonUrl.replace(this.additionalProperties.uriSchema, ""));
+                match = instance.ButtonUrl.match(this.suffixRegex);
+                if(match) {
+                    this.additionalProperties.buttonBody = match[1];
+                    this.buttonUrlControl.setValue(this.buttonUrlControl.value.replace(match[0], ""));
+                }
+            }            
             else
                 this.buttonUrlControl.setValue(instance.ButtonUrl);
         }
@@ -160,14 +180,14 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
                 this.additionalProperties.finalOpacity = +match[1];                 //read the value
             this.overlayStyleControl.setValue(instance.OverlayStyle.replace(this.opacityRegex, "")); //and remove it from displaying
         }
-        if(this.animSelector)
+        if (this.animSelector)
             this.animSelector.selectedAnimation = SlideAnimations.find(a => a.name == instance.Animation);
         this.dirty = false;
 
     }
 
     refreshAnimSelector() {
-        if(this.animSelector)
+        if (this.animSelector)
             this.animSelector.sliderAnimations = SlideAnimations;
     }
 

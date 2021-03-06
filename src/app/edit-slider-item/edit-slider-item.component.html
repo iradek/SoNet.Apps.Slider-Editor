@@ -59,21 +59,26 @@
             <div class="uk-margin">
                 <label class="uk-form-label" for="txtButtonUrl">Button Url:</label>
                 <div class="uk-form-controls">
-                    <div uk-grid class="uk-grid-small">
+                    <div data-uk-grid class="uk-grid-small uk-child-width-1-1 uk-child-width-auto@m">
                         <div>
                             <select class="uk-select uk-form-width-small" [(ngModel)]="additionalProperties.uriSchema"
-                                [ngModelOptions]="{standalone: true}" name="uriSchema">
+                                [ngModelOptions]="{standalone: true}" (ngModelChange)="onSchemaChange($event)" name="uriSchema">
                                 <option value="http://">http://</option>
                                 <option value="https://">https://</option>
                                 <option value="tel:">tel:</option>
+                                <option value="sms:">sms:</option>
                             </select>
                         </div>
-                        <div>
+                        <div class="uk-width-1-3@m">
                             <input id="txtButtonUrl" formControlName="ButtonUrl" type="text"
-                                placeholder="enter url behind the button" class="uk-input">
+                                [placeholder]="txtButtonUrl_placeholder" class="uk-input">
+                        </div>
+                        <div class="uk-width-1-3@m" *ngIf="additionalProperties.uriSchema === 'sms:'">
+                            <input id="txtButtonBody" [(ngModel)]="additionalProperties.buttonBody" [ngModelOptions]="{standalone: true}" 
+                                type="text" placeholder="optional pre-set text message" class="uk-input">
                         </div>
                     </div>
-                    <span class="uk-text-muted uk-text-small">This url will open when button is clicked</span>
+                    <span class="uk-text-muted uk-text-small">This link will open when button is clicked</span>
                 </div>
             </div>
             <div class="uk-margin-top">
