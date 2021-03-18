@@ -6,6 +6,7 @@ import { SlideAnimations } from '../models/slideAnimation';
 import { AnimSelectorComponent } from '../anim-selector/anim-selector.component';
 import { SliderApiClient } from '../services/sliderApiClient';
 import { SoNetUrlService } from "@iradek/sonet-appskit";
+import { ImageCroppedEvent, ImageCropperComponent } from 'ngx-image-cropper';
 
 
 @Component({
@@ -16,6 +17,8 @@ import { SoNetUrlService } from "@iradek/sonet-appskit";
 export class EditSliderItemComponent implements OnInit, OnDestroy {
 
     imagedata: any = "";
+    imageChangedEvent: any = '';
+    croppedImage: any = '';
     videodata: any;
     /**
      * When true - video that was uploaded is still being encoded
@@ -52,6 +55,7 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
     get buttonUrlControl() { return this.editSliderItemForm ? this.editSliderItemForm.get("ButtonUrl") : null; };
 
     @ViewChild("imgContainer", { static: true }) imgContainer: ElementRef;
+    @ViewChild("imageCropper", undefined) imgCropper: ImageCropperComponent;
 
     @Input()
     set sliderItem(value: SliderItem) {
@@ -212,6 +216,7 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
             that.dirty = true;
         };
         myReader.readAsDataURL(file);
+        this.imageChangedEvent = $event;
     }
 
     handleFileUpload(uploadResults: any, file: File) {
@@ -227,6 +232,19 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
         else {
             setTimeout(() => this.imagedata = uploadResults, 100);
         }
+    }
+
+    imageCropped(event: ImageCroppedEvent) {
+        this.croppedImage = event.base64;
+    }
+    imageLoaded(image: HTMLImageElement) {
+        // show cropper
+    }
+    cropperReady() {
+        // cropper ready
+    }
+    loadImageFailed() {
+        // show message
     }
 
     private async checkVideoStatusAsync(sliderItem: SliderItem) {
