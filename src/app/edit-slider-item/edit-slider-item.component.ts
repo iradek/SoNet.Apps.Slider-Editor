@@ -18,6 +18,7 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
 
     imagedata: any = "";
     imageChangedEvent: any = '';
+    showCropper = false;
     croppedImage: any = '';
     videodata: any;
     /**
@@ -129,7 +130,6 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
         return "enter url";
     }
 
-
     buildForm(): void {
         this.editSliderItemForm = this.formBuilder.group({
             "TagTitle": [this.sliderItem.TagTitle, []],
@@ -150,9 +150,7 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
             this.sliderItem.ButtonUrl = this.additionalProperties.uriSchema + this.buttonUrlControl.value + (this.additionalProperties.buttonBody ? "?&body=" + this.additionalProperties.buttonBody : "");
         const additionalOverlayStyle: string = this.overlayStyleControl?.value || "";
         this.sliderItem.OverlayStyle = additionalOverlayStyle + this.opacityCSS;
-        //pass back real cropped width
         this.sliderItem.Animation = this.animSelector?.selectedAnimation != null ? this.animSelector?.selectedAnimation.name : null;
-
         this.sliderChange.emit(this.slider);
         return this.sliderItem;
     }
@@ -170,11 +168,11 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
                 this.additionalProperties.uriSchema = match[1];
                 this.buttonUrlControl.setValue(instance.ButtonUrl.replace(this.additionalProperties.uriSchema, ""));
                 match = instance.ButtonUrl.match(this.suffixRegex);
-                if(match) {
+                if (match) {
                     this.additionalProperties.buttonBody = match[1];
                     this.buttonUrlControl.setValue(this.buttonUrlControl.value.replace(match[0], ""));
                 }
-            }            
+            }
             else
                 this.buttonUrlControl.setValue(instance.ButtonUrl);
         }
@@ -237,12 +235,20 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
     imageCropped(event: ImageCroppedEvent) {
         this.croppedImage = event.base64;
     }
-    imageLoaded(image: HTMLImageElement) {
+
+    imageLoaded(image: any) {
         // show cropper
+        if (!image)
+            return;        
+        const width = image.original.size.width;
+        const height = image.original.size.height;
+        this.showCropper = width > 0 && height > 0 && height > width; //support for vertical image
     }
+
     cropperReady() {
         // cropper ready
     }
+
     loadImageFailed() {
         // show message
     }
