@@ -3,6 +3,7 @@ import { Slider } from "../models/slider";
 import { SliderItem } from "../models/sliderItem";
 import { UtilsService } from "./utils.service";
 import { SoNetApiClient, SoNetConfigService, SoNetProxy } from "@iradek/sonet-appskit";
+import { Rectangle } from "../models/rectangle";
 
 @Injectable()
 export class SliderApiClient extends SoNetApiClient {
@@ -89,11 +90,17 @@ export class SliderApiClient extends SoNetApiClient {
             return await this.saveSliderItemAsync(sliderItem);
     }
 
-    async uploadSliderItemImageAsync(sliderItemID: string, imageDataUri: string): Promise<SliderItem> {
+    async uploadSliderItemImageAsync(sliderItemID: string, imageDataUri: string, cropRectangle?: Rectangle): Promise<SliderItem> {
         const url = `/odata/SliderItems(${sliderItemID})/SoNET.UploadImage`;
         const imageBlob = this.utilsService.dataURItoBlob(imageDataUri);
         let formData: FormData = new FormData();
         formData.append("file", imageBlob, "slideimage");
+        if (cropRectangle && cropRectangle.isValid) {
+            formData.append("crop-left", cropRectangle.left.toString());
+            formData.append("crop-top", cropRectangle.top.toString());
+            formData.append("crop-right", cropRectangle.right.toString());
+            formData.append("crop-bottom", cropRectangle.bottom.toString());
+        }
         formData.append("SiteName", this.sonetConfigService.config.siteName!);
         return await this.soNetProxy.post$<SliderItem>(url, formData).toPromise();
     }
@@ -125,12 +132,12 @@ export class SliderApiClient extends SoNetApiClient {
     }
 
     async updateSeoScripts(siteName: string, seoScripts: string) {
-        if(!siteName)
+        if (!siteName)
             throw new Error("Invalid siteName while updating seo scripts");
-        if(!seoScripts)
+        if (!seoScripts)
             return;
         const url = `odata/Sites('${siteName}')/SoNET.UpdateSEOScripts`;
-        const postObject = { "SEOScripts": seoScripts};
+        const postObject = { "SEOScripts": seoScripts };
         await this.soNetProxy.post$(url, postObject).toPromise();
     }
 
