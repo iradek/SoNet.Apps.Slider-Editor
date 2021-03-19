@@ -56,7 +56,6 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
     get buttonUrlControl() { return this.editSliderItemForm ? this.editSliderItemForm.get("ButtonUrl") : null; };
 
     @ViewChild("imgContainer", { static: true }) imgContainer: ElementRef;
-    @ViewChild("imageCropper", undefined) imgCropper: ImageCropperComponent;
 
     @Input()
     set sliderItem(value: SliderItem) {
