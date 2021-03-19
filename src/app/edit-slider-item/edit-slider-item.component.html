@@ -5,8 +5,11 @@
     </div>
     <div class="sonet-slider-image">
         <div class="sonet-slider-overlay" [style.opacity]="additionalProperties.finalOpacity"></div>
-        <img *ngIf="imgSource && !videoSource" class="sonet-slider-croppedImage" [src]="imgSource"
+        <img [hidden]="showCropper" *ngIf="imgSource && !videoSource" class="sonet-slider-croppedImage" [src]="imgSource"
             [style.width.px]="finalWidth">
+        <image-cropper [hidden]="!showCropper" [imageChangedEvent]="imageChangedEvent" [maintainAspectRatio]="true"
+            [aspectRatio]="16 / 9" format="jpg" (imageCropped)="imageCropped($event)" (imageLoaded)="imageLoaded($event)"
+            (cropperReady)="cropperReady()" (loadImageFailed)="loadImageFailed()"></image-cropper>
         <video *ngIf="videoSource" style="width: 100%" data-uk-video="autoplay: inview" #video controls
             [src]="videoSource"></video>
     </div>
@@ -23,7 +26,6 @@
     <div class="uk-card-title">Video is being encoded.</div>
     <div class="loader sonet-loader"></div>
 </div>
-
 <div class="uk-margin-top uk-padding@m">
     <form [formGroup]="editSliderItemForm" class="uk-form-stacked">
         <fieldset>
@@ -62,7 +64,8 @@
                     <div data-uk-grid class="uk-grid-small uk-child-width-1-1 uk-child-width-auto@m">
                         <div>
                             <select class="uk-select uk-form-width-small" [(ngModel)]="additionalProperties.uriSchema"
-                                [ngModelOptions]="{standalone: true}" (ngModelChange)="onSchemaChange($event)" name="uriSchema">
+                                [ngModelOptions]="{standalone: true}" (ngModelChange)="onSchemaChange($event)"
+                                name="uriSchema">
                                 <option value="http://">http://</option>
                                 <option value="https://">https://</option>
                                 <option value="tel:">tel:</option>
@@ -74,8 +77,9 @@
                                 [placeholder]="txtButtonUrl_placeholder" class="uk-input">
                         </div>
                         <div class="uk-width-1-3@m" *ngIf="additionalProperties.uriSchema === 'sms:'">
-                            <input id="txtButtonBody" [(ngModel)]="additionalProperties.buttonBody" [ngModelOptions]="{standalone: true}" 
-                                type="text" placeholder="optional pre-set text message" class="uk-input">
+                            <input id="txtButtonBody" [(ngModel)]="additionalProperties.buttonBody"
+                                [ngModelOptions]="{standalone: true}" type="text"
+                                placeholder="optional pre-set text message" class="uk-input">
                         </div>
                     </div>
                     <span class="uk-text-muted uk-text-small">This link will open when button is clicked</span>

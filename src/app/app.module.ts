@@ -16,6 +16,7 @@ import { SoNetAppsKitModule, SoNetConfigService } from '@iradek/sonet-appskit';
 import { SliderApiClient } from './services/sliderApiClient';
 import { UtilsService } from './services/utils.service';
 import { SoNetAppConfig } from './sonetapp.config';
+import { ImageCropperModule } from 'ngx-image-cropper';
 
 @NgModule({
   declarations: [AppComponent, EditSlider, EditSliderItemComponent, AnimSelectorComponent],
@@ -28,7 +29,8 @@ import { SoNetAppConfig } from './sonetapp.config';
     SharedModule,       
     AccordionModule,    
     ToastModule,
-    SliderModule    
+    SliderModule,
+    ImageCropperModule
   ],
   providers: [SliderApiClient, UtilsService, MessageService,
     {
