@@ -6,6 +6,8 @@ import { SlideAnimations } from '../models/slideAnimation';
 import { AnimSelectorComponent } from '../anim-selector/anim-selector.component';
 import { SliderApiClient } from '../services/sliderApiClient';
 import { SoNetUrlService } from "@iradek/sonet-appskit";
+import { ImageCroppedEvent, ImageCropperComponent } from 'ngx-image-cropper';
+import { Rectangle } from '../models/rectangle';
 
 
 @Component({
@@ -16,6 +18,9 @@ import { SoNetUrlService } from "@iradek/sonet-appskit";
 export class EditSliderItemComponent implements OnInit, OnDestroy {
 
     imagedata: any = "";
+    imageChangedEvent: any = '';
+    showCropper = false;
+    croppedImage: any = '';
     videodata: any;
     /**
      * When true - video that was uploaded is still being encoded
@@ -23,7 +28,6 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
     videoIsProcessing: boolean = false;
     videoProcessingInterval: any;
     defaultOpacity: number = 0.2;
-    defaultHeight: number = 300;
     editSliderItemForm?: FormGroup;
     additionalProperties = {
         uriSchema: "https://",
@@ -92,6 +96,11 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
         this._videoSource = value;
     }
 
+    /**
+     * Crop rectangle (when supported) with coordinates relative to original image size
+     */
+    cropRectangle? : Rectangle;
+
     @ViewChild(AnimSelectorComponent) animSelector?: AnimSelectorComponent;
 
     constructor(private formBuilder: FormBuilder, private sonetUrlService: SoNetUrlService, private apiClient: SliderApiClient) { }
@@ -125,7 +134,6 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
         return "enter url";
     }
 
-
     buildForm(): void {
         this.editSliderItemForm = this.formBuilder.group({
             "TagTitle": [this.sliderItem.TagTitle, []],
@@ -146,9 +154,7 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
             this.sliderItem.ButtonUrl = this.additionalProperties.uriSchema + this.buttonUrlControl.value + (this.additionalProperties.buttonBody ? "?&body=" + this.additionalProperties.buttonBody : "");
         const additionalOverlayStyle: string = this.overlayStyleControl?.value || "";
         this.sliderItem.OverlayStyle = additionalOverlayStyle + this.opacityCSS;
-        //pass back real cropped width
         this.sliderItem.Animation = this.animSelector?.selectedAnimation != null ? this.animSelector?.selectedAnimation.name : null;
-
         this.sliderChange.emit(this.slider);
         return this.sliderItem;
     }
@@ -166,11 +172,11 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
                 this.additionalProperties.uriSchema = match[1];
                 this.buttonUrlControl.setValue(instance.ButtonUrl.replace(this.additionalProperties.uriSchema, ""));
                 match = instance.ButtonUrl.match(this.suffixRegex);
-                if(match) {
+                if (match) {
                     this.additionalProperties.buttonBody = match[1];
                     this.buttonUrlControl.setValue(this.buttonUrlControl.value.replace(match[0], ""));
                 }
-            }            
+            }
             else
                 this.buttonUrlControl.setValue(instance.ButtonUrl);
         }
@@ -212,6 +218,7 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
             that.dirty = true;
         };
         myReader.readAsDataURL(file);
+        this.imageChangedEvent = $event;
     }
 
     handleFileUpload(uploadResults: any, file: File) {
@@ -227,6 +234,27 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
         else {
             setTimeout(() => this.imagedata = uploadResults, 100);
         }
+    }
+
+    imageCropped(event: ImageCroppedEvent) {        
+        this.croppedImage = event.base64;
+        this.cropRectangle = new Rectangle(event.imagePosition.x1, event.imagePosition.y1, event.imagePosition.x2, event.imagePosition.y2);
+    }
+
+    imageLoaded(image: any) {
+        if (!image)
+            return;        
+        const width = image.original.size.width;
+        const height = image.original.size.height;
+        this.showCropper = width > 0 && height > 0 && height > width; //support for vertical image
+    }
+
+    cropperReady() {
+        // cropper ready
+    }
+
+    loadImageFailed() {
+        alert('We had problems loading this image. Sorry for that. Please try different one.')
     }
 
     private async checkVideoStatusAsync(sliderItem: SliderItem) {
