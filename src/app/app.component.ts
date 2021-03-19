@@ -65,7 +65,7 @@ export class AppComponent {
             let validSliderItemImageToUpload = editSliderControl.dirty && editSliderControl.imagedata;
             if (validSliderItemImageToUpload) {
                 if (this.ensureFileSize(editSliderControl.imagedata.length, sliderItem))
-                    savedSliderItem = await this.apiClient.uploadSliderItemImageAsync(savedSliderItem.SliderItemID, editSliderControl.imagedata);
+                    savedSliderItem = await this.apiClient.uploadSliderItemImageAsync(savedSliderItem.SliderItemID, editSliderControl.imagedata, editSliderControl.cropRectangle);
                 else
                     editSliderControl.resetImage();
             }

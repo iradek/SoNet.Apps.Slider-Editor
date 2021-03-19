@@ -7,6 +7,7 @@ import { AnimSelectorComponent } from '../anim-selector/anim-selector.component'
 import { SliderApiClient } from '../services/sliderApiClient';
 import { SoNetUrlService } from "@iradek/sonet-appskit";
 import { ImageCroppedEvent, ImageCropperComponent } from 'ngx-image-cropper';
+import { Rectangle } from '../models/rectangle';
 
 
 @Component({
@@ -27,7 +28,6 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
     videoIsProcessing: boolean = false;
     videoProcessingInterval: any;
     defaultOpacity: number = 0.2;
-    defaultHeight: number = 300;
     editSliderItemForm?: FormGroup;
     additionalProperties = {
         uriSchema: "https://",
@@ -96,6 +96,11 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
     set videoSource(value: string | null) {
         this._videoSource = value;
     }
+
+    /**
+     * Crop rectangle (when supported) with coordinates relative to original image size
+     */
+    cropRectangle? : Rectangle;
 
     @ViewChild(AnimSelectorComponent) animSelector?: AnimSelectorComponent;
 
@@ -232,12 +237,12 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
         }
     }
 
-    imageCropped(event: ImageCroppedEvent) {
+    imageCropped(event: ImageCroppedEvent) {        
         this.croppedImage = event.base64;
+        this.cropRectangle = new Rectangle(event.imagePosition.x1, event.imagePosition.y1, event.imagePosition.x2, event.imagePosition.y2);
     }
 
     imageLoaded(image: any) {
-        // show cropper
         if (!image)
             return;        
         const width = image.original.size.width;
@@ -250,7 +255,7 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
     }
 
     loadImageFailed() {
-        // show message
+        alert('We had problems loading this image. Sorry for that. Please try different one.')
     }
 
     private async checkVideoStatusAsync(sliderItem: SliderItem) {
