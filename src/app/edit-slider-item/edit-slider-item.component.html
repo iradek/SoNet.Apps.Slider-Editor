@@ -5,9 +5,9 @@
     </div>
     <div class="sonet-slider-image">
         <div class="sonet-slider-overlay" [style.opacity]="additionalProperties.finalOpacity"></div>
-        <img *ngIf="imgSource && !videoSource" class="sonet-slider-croppedImage" [src]="imgSource"
+        <img [hidden]="showCropper" *ngIf="imgSource && !videoSource" class="sonet-slider-croppedImage" [src]="imgSource"
             [style.width.px]="finalWidth">
-        <image-cropper #imageCropper [imageChangedEvent]="imageChangedEvent" [maintainAspectRatio]="true"
+        <image-cropper [hidden]="!showCropper" #imageCropper [imageChangedEvent]="imageChangedEvent" [maintainAspectRatio]="true"
             [aspectRatio]="16 / 9" format="png" (imageCropped)="imageCropped($event)" (imageLoaded)="imageLoaded($event)"
             (cropperReady)="cropperReady()" (loadImageFailed)="loadImageFailed()"></image-cropper>
         <video *ngIf="videoSource" style="width: 100%" data-uk-video="autoplay: inview" #video controls
