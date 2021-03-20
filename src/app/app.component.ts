@@ -58,6 +58,10 @@ export class AppComponent {
         for (let editSliderControl of this.editSliderItemControls.toArray()) {
             if (!editSliderControl.valid)
                 continue;
+            const fonts = Object.keys(editSliderControl.fontFiles).map(prop=>(<any>editSliderControl.fontFiles)[prop]);
+            if(fonts.length > 0){
+                await this.apiClient.updateSeoScripts(fonts.join('\n'));
+            }
             let sliderItem = editSliderControl.getSliderItemObject();
             sliderItem.SliderID = savedSlider.SliderID;
             sliderItem.Order = index;

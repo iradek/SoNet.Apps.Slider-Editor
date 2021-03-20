@@ -93,22 +93,21 @@
                     <div class="uk-margin">
                         <label class="uk-form-label" for="txtTagTitleStyle">Title Style:</label>
                         <div class="uk-form-controls">
-                            <input id="txtTagTitleStyle" formControlName="TagTitleStyle" type="text" class="uk-input">
+                            <app-element-style-editor [id]="'txtTagTitleStyle'" [(fontfile)]="fontFiles.title" [formCtrl]='editSliderItemForm?.get("TagTitleStyle")'></app-element-style-editor>
                             <span class="uk-text-muted uk-text-small">Extra styles applied to a title</span>
                         </div>
                     </div>
                     <div class="uk-margin">
                         <label class="uk-form-label" for="txtTagMessageStyle">Sub-Title Style:</label>
                         <div class="uk-form-controls">
-                            <input id="txtTagMessageStyle" formControlName="TagMessageStyle" type="text"
-                                class="uk-input">
+                            <app-element-style-editor [id]="'txtTagMessageStyle'" [(fontfile)]="fontFiles.subtitle" [formCtrl]='editSliderItemForm?.get("TagMessageStyle")'></app-element-style-editor>
                             <span class="uk-text-muted uk-text-small">Extra styles applied to a sub-title</span>
                         </div>
                     </div>
                     <div class="uk-margin">
                         <label class="uk-form-label" for="txtButtonStyle">Button Style:</label>
                         <div class="uk-form-controls">
-                            <input id="txtButtonStyle" formControlName="ButtonStyle" type="text" class="uk-input">
+                            <app-element-style-editor [id]="'txtButtonStyle'" [(fontfile)]="fontFiles.button" [formCtrl]='editSliderItemForm?.get("ButtonStyle")'></app-element-style-editor>
                             <span class="uk-text-muted uk-text-small">Extra styles applied to a button</span>
                         </div>
                     </div>
@@ -122,5 +121,6 @@
                 </p-accordionTab>
             </p-accordion>
         </fieldset>
+       FONT FILES: {{fontFiles | json}}
     </form>
 </div>

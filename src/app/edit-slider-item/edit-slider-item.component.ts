@@ -7,7 +7,6 @@ import { AnimSelectorComponent } from '../anim-selector/anim-selector.component'
 import { SliderApiClient } from '../services/sliderApiClient';
 import { SoNetUrlService } from "@iradek/sonet-appskit";
 
-
 @Component({
     selector: 'sonet-edit-slider-item',
     templateUrl: './edit-slider-item.component.html',
@@ -35,6 +34,12 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
             this.opacityValue = value * 100;
         }
     };
+
+    fontFiles:{
+        title?: string;
+        subtitle?: string;
+        button?: string;
+    } = {};
     /**
      * When true - it contains an image or video that needs to be uploaded.
      */

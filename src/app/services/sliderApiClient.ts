@@ -124,6 +124,17 @@ export class SliderApiClient extends SoNetApiClient {
         return jobState !== "Unknown" && jobState !== "Succeeded";
     }
 
+    async updateSeoScripts(seoScripts: string) {
+        const siteName = this.sonetConfigService.config.siteName!;
+        if(!siteName)
+            throw new Error("Invalid siteName while updating seo scripts");
+        if(!seoScripts)
+            return;
+        const url = `odata/Sites('${siteName}')/SoNET.UpdateSEOScripts`;
+        const postObject = { "SEOScripts": seoScripts};
+        await this.soNetProxy.post$(url, postObject).toPromise();
+    }
+
     isEmpty(value: string) {
         return !value || value === '00000000-0000-0000-0000-000000000000';
     }
