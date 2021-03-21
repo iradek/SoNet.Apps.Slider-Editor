@@ -17,3 +17,6 @@ fieldset { margin: 0 !important; }
 .sonet-slider-static {
     font-weight: 600;
 }
+.sonet-form-icon{
+    height: 41px;
+}

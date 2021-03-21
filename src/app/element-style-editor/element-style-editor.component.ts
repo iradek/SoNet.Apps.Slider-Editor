@@ -34,8 +34,6 @@ export class ElementStyleEditorComponent implements OnInit {
       styles: ['regular']
   });
 
-  inputVal: string;
-
   private styleValue(){
     return (this.formCtrl.value as string).split(";").filter(t=>t && t.indexOf("font")==-1);
   }
@@ -53,8 +51,7 @@ export class ElementStyleEditorComponent implements OnInit {
     parsed_font.forEach(val=>{
       (<any>this.font)[val.prop] = val.value;  //TODO: not realy safe
     });
-
-    this.inputVal = this.styleValue().join(";");
+    this.styleValue().join(";");
   }
   ngOnInit(): void {
   }

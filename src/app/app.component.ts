@@ -58,9 +58,13 @@ export class AppComponent {
         for (let editSliderControl of this.editSliderItemControls.toArray()) {
             if (!editSliderControl.valid)
                 continue;
-            const fonts = Object.keys(editSliderControl.fontFiles).map(prop=>(<any>editSliderControl.fontFiles)[prop]);
+            const toFontTag = (fontUrl: string) => ` <link href='${fontUrl}' rel='stylesheet' type='text/css'>`;
+            const fonts = Object.keys(editSliderControl.fontFiles)
+                .map(prop=>(<any>editSliderControl.fontFiles)[prop])
+                .filter(font=>font.files)
+                .map(font=> font.files[font.style]);
             if(fonts.length > 0){
-                await this.apiClient.updateSeoScripts(fonts.join('\n'));
+                await this.apiClient.updateSeoScripts(fonts.map(t=>toFontTag(t)).join('\n'));
             }
             let sliderItem = editSliderControl.getSliderItemObject();
             sliderItem.SliderID = savedSlider.SliderID;
