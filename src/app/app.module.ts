@@ -18,7 +18,6 @@ import { UtilsService } from './services/utils.service';
 import { SoNetAppConfig } from './sonetapp.config';
 import { FontPickerConfigInterface, FontPickerModule, FONT_PICKER_CONFIG } from 'ngx-font-picker';
 import { environment } from 'src/environments/environment';
-import { ElementStyleEditorComponent } from './element-style-editor/element-style-editor.component';
 
 const DEFAULT_FONT_PICKER_CONFIG: FontPickerConfigInterface = {
   // Change this to your Google API key
@@ -26,7 +25,7 @@ const DEFAULT_FONT_PICKER_CONFIG: FontPickerConfigInterface = {
 };
 
 @NgModule({
-  declarations: [AppComponent, EditSlider, EditSliderItemComponent, AnimSelectorComponent, ElementStyleEditorComponent],
+  declarations: [AppComponent, EditSlider, EditSliderItemComponent, AnimSelectorComponent],
   imports: [
     BrowserModule,    
     BrowserAnimationsModule,

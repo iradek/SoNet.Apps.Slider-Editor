@@ -1,8 +1,0 @@
-.inline-block{
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-}
-.inline-block>input{
-    margin-left: 10px;
-}
