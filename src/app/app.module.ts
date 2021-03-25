@@ -18,10 +18,11 @@ import { UtilsService } from './services/utils.service';
 import { SoNetAppConfig } from './sonetapp.config';
 import { FontPickerConfigInterface, FontPickerModule, FONT_PICKER_CONFIG } from 'ngx-font-picker';
 import { environment } from 'src/environments/environment';
+import { ImageCropperModule } from 'ngx-image-cropper';
 
 const DEFAULT_FONT_PICKER_CONFIG: FontPickerConfigInterface = {
-  // Change this to your Google API key
-  apiKey: environment.apiKey
+    // Change this to your Google API key
+    apiKey: environment.apiKey
 };
 
 @NgModule({
@@ -36,7 +37,8 @@ const DEFAULT_FONT_PICKER_CONFIG: FontPickerConfigInterface = {
     AccordionModule,    
     ToastModule,
     SliderModule,
-    FontPickerModule    
+    FontPickerModule,    
+    ImageCropperModule
   ],
   providers: [SliderApiClient, UtilsService, MessageService,
     {

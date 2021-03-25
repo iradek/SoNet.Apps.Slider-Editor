@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter, Input, ViewChild, ElementRef, OnDestroy } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, Input, ViewChild, ElementRef, OnDestroy, OnChanges, SimpleChanges } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { SliderItem } from "../models/sliderItem";
 import { Slider } from "../models/slider";
@@ -7,6 +7,9 @@ import { AnimSelectorComponent } from '../anim-selector/anim-selector.component'
 import { SliderApiClient } from '../services/sliderApiClient';
 import { SoNetUrlService } from "@iradek/sonet-appskit";
 import { Font } from 'ngx-font-picker';
+import { ImageCroppedEvent, ImageCropperComponent } from 'ngx-image-cropper';
+import { Rectangle } from '../models/rectangle';
+
 
 @Component({
     selector: 'sonet-edit-slider-item',
@@ -16,6 +19,9 @@ import { Font } from 'ngx-font-picker';
 export class EditSliderItemComponent implements OnInit, OnDestroy {
 
     imagedata: any = "";
+    imageChangedEvent: any = '';
+    showCropper = false;
+    croppedImage: any = '';
     videodata: any;
     /**
      * When true - video that was uploaded is still being encoded
@@ -23,11 +29,11 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
     videoIsProcessing: boolean = false;
     videoProcessingInterval: any;
     defaultOpacity: number = 0.2;
-    defaultHeight: number = 300;
     editSliderItemForm?: FormGroup;
     additionalProperties = {
-        uriSchema: "http://",
+        uriSchema: "https://",
         opacityValue: (this.defaultOpacity * 100),
+        buttonBody: "",
         get finalOpacity(): number {
             return this.opacityValue / 100;
         },
@@ -41,6 +47,7 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
         TagMessageFont?: Font;
         ButtonFont?: Font;
     };
+    txtButtonUrl_placeholder = this.resolveSchemaPlaceholder(this.additionalProperties.uriSchema);
     /**
      * When true - it contains an image or video that needs to be uploaded.
      */
@@ -48,7 +55,8 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
 
     get opacityCSS(): string { return `;background-color: rgba(34,34,34, ${this.additionalProperties.finalOpacity});`; }; //must be a property to re-evaluate on each call
     opacityRegex: RegExp = new RegExp(";background-color:\\s+rgba\\(34,34,34,\\s+([0-9]*\\.?[0-9]+)\\);*", "i");
-    prefixRegex: RegExp = new RegExp("^(http[s]*:\\/\\/|tel:)", "i");
+    prefixRegex: RegExp = new RegExp("^(http[s]*:\\/\\/|tel:|sms:)", "i");
+    suffixRegex: RegExp = new RegExp("\\?&body=(.*)", "i");
 
     get overlayStyleControl() { return this.editSliderItemForm ? this.editSliderItemForm.get("OverlayStyle") : null; };
     get buttonUrlControl() { return this.editSliderItemForm ? this.editSliderItemForm.get("ButtonUrl") : null; };
@@ -94,6 +102,11 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
         this._videoSource = value;
     }
 
+    /**
+     * Crop rectangle (when supported) with coordinates relative to original image size
+     */
+    cropRectangle? : Rectangle;
+
     @ViewChild(AnimSelectorComponent) animSelector?: AnimSelectorComponent;
 
     constructor(private formBuilder: FormBuilder, private sonetUrlService: SoNetUrlService, private apiClient: SliderApiClient) { }
@@ -102,10 +115,13 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
         this.buildForm();
     }
 
+    onSchemaChange(newSchema: string) {
+        this.txtButtonUrl_placeholder = this.resolveSchemaPlaceholder(newSchema);
+    }
+
     ngOnDestroy() {
         this.stopVideoProcessingInterval();
     }
-
 
     private startVideoProcessingInterval() {
         this.videoProcessingInterval = setInterval(async () => await this.checkVideoStatusAsync(this.sliderItem), 2000);
@@ -140,6 +156,13 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
         return font;
     }
 
+    private resolveSchemaPlaceholder(schema: string) {
+        if (!schema)
+            return "";
+        if (schema === "tel:" || schema === "sms:")
+            return "enter phone number";
+        return "enter url";
+    }
 
     buildForm(): void {
         this.editSliderItemForm = this.formBuilder.group({
@@ -166,10 +189,9 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
     getSliderItemObject(): SliderItem {
         Object.assign(this.sliderItem, this.editSliderItemForm?.value);
         if (this.buttonUrlControl?.value)
-            this.sliderItem.ButtonUrl = this.additionalProperties.uriSchema + this.buttonUrlControl.value;
+            this.sliderItem.ButtonUrl = this.additionalProperties.uriSchema + this.buttonUrlControl.value + (this.additionalProperties.buttonBody ? "?&body=" + this.additionalProperties.buttonBody : "");
         const additionalOverlayStyle: string = this.overlayStyleControl?.value || "";
         this.sliderItem.OverlayStyle = additionalOverlayStyle + this.opacityCSS;
-        //pass back real cropped width
         this.sliderItem.Animation = this.animSelector?.selectedAnimation != null ? this.animSelector?.selectedAnimation.name : null;
     
         const fontStr = (font: any) => font? 
@@ -197,7 +219,12 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
             let match = instance.ButtonUrl.match(this.prefixRegex);
             if (match) {
                 this.additionalProperties.uriSchema = match[1];
-                this.buttonUrlControl!.setValue(instance.ButtonUrl.replace(this.additionalProperties.uriSchema, ""));
+                this.buttonUrlControl.setValue(instance.ButtonUrl.replace(this.additionalProperties.uriSchema, ""));
+                match = instance.ButtonUrl.match(this.suffixRegex);
+                if (match) {
+                    this.additionalProperties.buttonBody = match[1];
+                    this.buttonUrlControl.setValue(this.buttonUrlControl.value.replace(match[0], ""));
+                }
             }
             else
                 this.buttonUrlControl.setValue(instance.ButtonUrl);
@@ -208,14 +235,14 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
                 this.additionalProperties.finalOpacity = +match[1];                 //read the value
             this.overlayStyleControl.setValue(instance.OverlayStyle.replace(this.opacityRegex, "")); //and remove it from displaying
         }
-        if(this.animSelector)
+        if (this.animSelector)
             this.animSelector.selectedAnimation = SlideAnimations.find(a => a.name == instance.Animation);
         this.dirty = false;
 
     }
 
     refreshAnimSelector() {
-        if(this.animSelector)
+        if (this.animSelector)
             this.animSelector.sliderAnimations = SlideAnimations;
     }
 
@@ -240,6 +267,7 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
             that.dirty = true;
         };
         myReader.readAsDataURL(file);
+        this.imageChangedEvent = $event;
     }
 
     handleFileUpload(uploadResults: any, file: File) {
@@ -255,6 +283,27 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
         else {
             setTimeout(() => this.imagedata = uploadResults, 100);
         }
+    }
+
+    imageCropped(event: ImageCroppedEvent) {        
+        this.croppedImage = event.base64;
+        this.cropRectangle = new Rectangle(event.imagePosition.x1, event.imagePosition.y1, event.imagePosition.x2, event.imagePosition.y2);
+    }
+
+    imageLoaded(image: any) {
+        if (!image)
+            return;        
+        const width = image.original.size.width;
+        const height = image.original.size.height;
+        this.showCropper = width > 0 && height > 0 && height > width; //support for vertical image
+    }
+
+    cropperReady() {
+        // cropper ready
+    }
+
+    loadImageFailed() {
+        alert('We had problems loading this image. Sorry for that. Please try different one.')
     }
 
     private async checkVideoStatusAsync(sliderItem: SliderItem) {

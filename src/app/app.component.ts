@@ -52,20 +52,15 @@ export class AppComponent {
         //save Slider
         let savedSlider = await this.apiClient.saveOrUpdateSliderAsync(this.currentSlider);
         this.currentSlider.SliderID = savedSlider.SliderID;
+        let currentSite = await this.apiClient.getSiteAsync();
+        if (!currentSite)
+            throw new Error("Current Site is null which is not supported while saving a Slider.");
 
         //save Slider Items
         let index: number = 0;
         for (let editSliderControl of this.editSliderItemControls.toArray()) {
             if (!editSliderControl.valid)
                 continue;
-            const toFontTag = (fontUrl: string) => ` <link href='${fontUrl}' rel='stylesheet' type='text/css'>`;
-            const fonts = Object.keys(editSliderControl.fontFiles)
-                .map(prop=>(<any>editSliderControl.fontFiles)[prop])
-                .filter(font=>font.files)
-                .map(font=> font.files[font.style]);
-            if(fonts.length > 0){
-                await this.apiClient.updateSeoScripts(fonts.map(t=>toFontTag(t)).join('\n'));
-            }
             let sliderItem = editSliderControl.getSliderItemObject();
             sliderItem.SliderID = savedSlider.SliderID;
             sliderItem.Order = index;
@@ -73,7 +68,7 @@ export class AppComponent {
             let validSliderItemImageToUpload = editSliderControl.dirty && editSliderControl.imagedata;
             if (validSliderItemImageToUpload) {
                 if (this.ensureFileSize(editSliderControl.imagedata.length, sliderItem))
-                    savedSliderItem = await this.apiClient.uploadSliderItemImageAsync(savedSliderItem.SliderItemID, editSliderControl.imagedata);
+                    savedSliderItem = await this.apiClient.uploadSliderItemImageAsync(savedSliderItem.SliderItemID, editSliderControl.imagedata, editSliderControl.cropRectangle);
                 else
                     editSliderControl.resetImage();
             }
@@ -86,12 +81,12 @@ export class AppComponent {
             }
             editSliderControl.sliderItem = savedSliderItem; //let it know so it can update instead of creating a new one
             this.currentSlider.SliderItemList[index] = savedSliderItem; //keep currentSlider.SliderItemList up to date as well (e.g. currentSlider.SliderItemList[index].SliderItemID is important for deleting later).
+
+            //TODO: Optimization : aggregate and save once per slider not per slider item
+            await this.saveFontsAsync(editSliderControl.fontFiles, currentSite.SiteName);
             index++;
         }
-        //associate with a Site
-        let currentSite = await this.apiClient.getSiteAsync();
-        if (!currentSite)
-            throw new Error("Current Site is null which is not supported while saving a Slider.");
+        //associate with a Site       
         await this.apiClient.saveSliderForSiteAsync(currentSite.SiteName, savedSlider.SliderID);
         this.messageService.add({ severity: "success", summary: "Success", detail: "Slider saved sucessfully. Refreshing the page..." });
     }
@@ -109,6 +104,21 @@ export class AppComponent {
             alert(`Your file for slider #${(sliderItem.Order || 0) + 1} exceeds maximum allowed file size. Please pick a smaller file.`);
         return isFileSizeOk;
     }
+
+    private async saveFontsAsync(fontFiles: any, siteName: string) {
+        if (!fontFiles)
+            return;
+        if (!siteName)
+            throw new Error('Invalid siteName while saving fonts.');
+        const toFontTag = (fontUrl: string) => ` <link href='${fontUrl}' rel='stylesheet' type='text/css'>`;
+        const fonts = Object.keys(fontFiles)
+            .map(prop => fontFiles[prop])
+            .filter(font => font.files) //TODO: investigate - why is font.files empty?
+            .map(font => font.files[font.style]);
+        if (fonts && fonts.length > 0)
+            await this.apiClient.updateSeoScripts(siteName, fonts.map(t => toFontTag(t)).join('\n'));        
+    }
+
 
     async deleteSliderItem(index: number) {
         const deletedSliderItems = this.currentSlider.SliderItemList.splice(index, 1);

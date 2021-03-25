@@ -3,6 +3,7 @@ import { Slider } from "../models/slider";
 import { SliderItem } from "../models/sliderItem";
 import { UtilsService } from "./utils.service";
 import { SoNetApiClient, SoNetConfigService, SoNetProxy } from "@iradek/sonet-appskit";
+import { Rectangle } from "../models/rectangle";
 
 @Injectable()
 export class SliderApiClient extends SoNetApiClient {
@@ -59,8 +60,8 @@ export class SliderApiClient extends SoNetApiClient {
             throw new Error("Invalid siteName while saving Slide for Site");
         if (!sliderID)
             throw new Error("Invalid sliderID while saving Slide for Site");
-        let url = `/odata/Sites('${siteName}')`;
-        let body = { "SliderID": sliderID };
+        const url = `/odata/Sites('${siteName}')`;
+        const body = { "SliderID": sliderID };
         return await this.soNetProxy.patch$(url, body).toPromise();
     }
 
@@ -82,25 +83,31 @@ export class SliderApiClient extends SoNetApiClient {
     async saveOrUpdateSliderItemAsync(sliderItem: SliderItem): Promise<SliderItem> {
         if (!sliderItem)
             throw new Error("Invalid SliderItem to save or update.");
-        let objectSaved = !this.isEmpty(sliderItem.SliderItemID)
+        const objectSaved = !this.isEmpty(sliderItem.SliderItemID)
         if (objectSaved)
             return await this.updateSliderItemAsync(sliderItem);
         else
             return await this.saveSliderItemAsync(sliderItem);
     }
 
-    async uploadSliderItemImageAsync(sliderItemID: string, imageDataUri: string): Promise<SliderItem> {
-        let url = `/odata/SliderItems(${sliderItemID})/SoNET.UploadImage`;
-        let imageBlob = this.utilsService.dataURItoBlob(imageDataUri);
+    async uploadSliderItemImageAsync(sliderItemID: string, imageDataUri: string, cropRectangle?: Rectangle): Promise<SliderItem> {
+        const url = `/odata/SliderItems(${sliderItemID})/SoNET.UploadImage`;
+        const imageBlob = this.utilsService.dataURItoBlob(imageDataUri);
         let formData: FormData = new FormData();
         formData.append("file", imageBlob, "slideimage");
+        if (cropRectangle && cropRectangle.isValid) {
+            formData.append("crop-left", cropRectangle.left.toString());
+            formData.append("crop-top", cropRectangle.top.toString());
+            formData.append("crop-right", cropRectangle.right.toString());
+            formData.append("crop-bottom", cropRectangle.bottom.toString());
+        }
         formData.append("SiteName", this.sonetConfigService.config.siteName!);
         return await this.soNetProxy.post$<SliderItem>(url, formData).toPromise();
     }
 
     async uploadSliderItemVideoAsync(sliderItemID: string, videoDataUri: string): Promise<SliderItem> {
-        let url = `/odata/SliderItems(${sliderItemID})/SoNET.UploadVideo`;
-        let imageBlob = this.utilsService.dataURItoBlob(videoDataUri);
+        const url = `/odata/SliderItems(${sliderItemID})/SoNET.UploadVideo`;
+        const imageBlob = this.utilsService.dataURItoBlob(videoDataUri);
         let formData: FormData = new FormData();
         formData.append("file", imageBlob, "slideVideo");
         formData.append("SiteName", this.sonetConfigService.config.siteName!);
@@ -110,28 +117,27 @@ export class SliderApiClient extends SoNetApiClient {
     async deleteSliderItemAsync(sliderItemID: string): Promise<SliderItem> {
         if (!sliderItemID)
             throw new Error("Invalid SliderItemID while deleting SliderItem");
-        let url = `/odata/SliderItems(${sliderItemID})`;
+        const url = `/odata/SliderItems(${sliderItemID})`;
         return await this.soNetProxy.delete$<SliderItem>(url).toPromise();
     }
 
     async isSliderVideoProcessing(sliderItemID: string) {
         if (!sliderItemID)
             throw new Error("Invalid SliderItemID while checking SliderItem video processing status");
-        let url = `/api/ObjectJobs/GetJobState?objectID=${sliderItemID}&objectTypeName=MediaLibrarianCore.SliderItem`;
+        const url = `/api/ObjectJobs/GetJobState?objectID=${sliderItemID}&objectTypeName=MediaLibrarianCore.SliderItem`;
         const jobState = await this.soNetProxy.get$<string>(url).toPromise();
         if (!jobState)
             return false;
         return jobState !== "Unknown" && jobState !== "Succeeded";
     }
 
-    async updateSeoScripts(seoScripts: string) {
-        const siteName = this.sonetConfigService.config.siteName!;
-        if(!siteName)
+    async updateSeoScripts(siteName: string, seoScripts: string) {
+        if (!siteName)
             throw new Error("Invalid siteName while updating seo scripts");
-        if(!seoScripts)
+        if (!seoScripts)
             return;
         const url = `odata/Sites('${siteName}')/SoNET.UpdateSEOScripts`;
-        const postObject = { "SEOScripts": seoScripts};
+        const postObject = { "SEOScripts": seoScripts };
         await this.soNetProxy.post$(url, postObject).toPromise();
     }
 
