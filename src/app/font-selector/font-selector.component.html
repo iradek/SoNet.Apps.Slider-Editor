@@ -1,0 +1,10 @@
+<a class="sonet-font-selector" [(fontPicker)]="selectorFont" 
+    #fontSelector
+    [fpWidth]="'320px'" [fpPosition]="'bottom'" 
+    [fpDialogDisplay]="'popup'" [fpCancelButton]=true 
+    [fpUploadButton]=true (fontPickerUpload)="selectFont()" 
+    [fpUploadButtonClass]="'uk-button uk-button-primary'" [fpUploadButtonText]="'Select'" 
+    [fpCancelButtonClass]="'uk-button'">
+    <i class="fa fa-font"></i>
+    <p>{{getFontLabel()}}</p> 
+</a>

@@ -72,18 +72,16 @@ export class AppComponent {
                 else
                     editSliderControl.resetImage();
             }
+            await this.saveFontsAsync(editSliderControl.selectedFonts, currentSite.SiteName);
             let validSliderItemVideoToUpload = editSliderControl.dirty && editSliderControl.videodata;
             if (validSliderItemVideoToUpload) {
                 if (this.ensureFileSize(editSliderControl.videodata.length, sliderItem))
                     savedSliderItem = await this.apiClient.uploadSliderItemVideoAsync(savedSliderItem.SliderItemID, editSliderControl.videodata);
                 else
                     editSliderControl.resetVideo();
-            }
+                }
             editSliderControl.sliderItem = savedSliderItem; //let it know so it can update instead of creating a new one
             this.currentSlider.SliderItemList[index] = savedSliderItem; //keep currentSlider.SliderItemList up to date as well (e.g. currentSlider.SliderItemList[index].SliderItemID is important for deleting later).
-
-            //TODO: Optimization : aggregate and save once per slider not per slider item
-            await this.saveFontsAsync(editSliderControl.fontFiles, currentSite.SiteName);
             index++;
         }
         //associate with a Site       
@@ -113,7 +111,8 @@ export class AppComponent {
         const toFontTag = (fontUrl: string) => ` <link href='${fontUrl}' rel='stylesheet' type='text/css'>`;
         const fonts = Object.keys(fontFiles)
             .map(prop => fontFiles[prop])
-            .filter(font => font.files) //TODO: investigate - why is font.files empty?
+            .filter(font=> font!=undefined)
+            .filter(font => font.files)
             .map(font => font.files[font.style]);
         if (fonts && fonts.length > 0)
             await this.apiClient.updateSeoScripts(siteName, fonts.map(t => toFontTag(t)).join('\n'));        

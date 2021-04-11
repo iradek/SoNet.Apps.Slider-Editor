@@ -1,0 +1,30 @@
+::ng-deep .font-picker .button-area{
+    justify-content: space-evenly;
+    display: flex;
+}
+
+::ng-deep .font-picker .button-area button{
+    margin-top: .5em;
+    margin-bottom: .2em;
+}
+.sonet-font-selector{
+    padding-left: 4px;
+    height: 41px;
+    width: 150px;  
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    display: inline-flex;
+    align-items: center;
+    color: #999;
+}
+.sonet-font-selector>i{
+    margin-right: 5px;
+}
+.sonet-font-selector>p{
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}

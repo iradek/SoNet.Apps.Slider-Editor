@@ -3,6 +3,7 @@ import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { SliderItem } from "../models/sliderItem";
 import { Slider } from "../models/slider";
 import { SlideAnimations } from '../models/slideAnimation';
+import { FontFiles } from '../models/font';
 import { AnimSelectorComponent } from '../anim-selector/anim-selector.component';
 import { SliderApiClient } from '../services/sliderApiClient';
 import { SoNetUrlService } from "@iradek/sonet-appskit";
@@ -42,11 +43,8 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
         }
     };
 
-    fontFiles:{
-        TagTitleFont?: Font;
-        TagMessageFont?: Font;
-        ButtonFont?: Font;
-    };
+    selectedFonts: FontFiles;
+    selectorFonts: FontFiles;
     txtButtonUrl_placeholder = this.resolveSchemaPlaceholder(this.additionalProperties.uriSchema);
     /**
      * When true - it contains an image or video that needs to be uploaded.
@@ -137,22 +135,30 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
     private fontValue(style: string): string[]{
       return style.split(";").filter(t=>t && t.indexOf("font")!=-1);
     }
-    private mapToFont(style: string): Font{
+    private mapToFont(style: string, usedefault: boolean): Font | undefined{
+        const font_value = this.fontValue(style);
+        if(!usedefault && !font_value.length) return undefined;
         var font = new Font({   //default
             family: 'Roboto',
             size: '14px',
             style: 'regular',
             styles: ['regular']
         });
-        const parsed_font = this.fontValue(style).map(val=>{
+        
+        var font_dict: {[prop: string]: string} = {};
+        font_value.map(val=>{
             return {
               value: val.split(':')[1].trim(),
-              prop: val.split(':')[0].replace('font-', '').replace('weight', 'style').trim()
+              prop: val.split(':')[0].replace('font-', '').trim()
             };
-          });
-          parsed_font.forEach(val=>{
-            (<any>font)[val.prop] = val.value;  //TODO: not realy safe
-          });
+          }).forEach(val=> font_dict[val.prop] = val.value);
+        font.family = font_dict['family'];
+        font.size = font_dict['size'];
+        const post_style = font_dict['style'] == "normal"? '' : font_dict['style'];
+        const pre_style = font_dict['weight'] == "normal"
+                ? post_style == '' ? 'regular' : '' 
+            : font_dict['weight'];
+        font.style = pre_style + post_style;
         return font;
     }
 
@@ -174,18 +180,15 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
             "TagMessageStyle": [this.styleValue(this.sliderItem.TagMessageStyle), []],
             "ButtonStyle": [this.styleValue(this.sliderItem.ButtonStyle), []],
             "OverlayStyle": [],
-            // "TagTitleFont": [this.mapToFont(this.sliderItem.TagTitleStyle)],
-            // "TagMessageFont": [this.mapToFont(this.sliderItem.TagMessageStyle)],
-            // "ButtonTextFont": [this.mapToFont(this.sliderItem.ButtonStyle)],
             //"Muted": [this.sliderItem.Muted, []]
         });
-        this.fontFiles = {
-            TagTitleFont: this.mapToFont(this.sliderItem.TagTitleStyle),
-            TagMessageFont: this.mapToFont(this.sliderItem.TagMessageStyle),
-            ButtonFont: this.mapToFont(this.sliderItem.ButtonStyle)
+        
+        this.selectedFonts = {
+            TagTitleFont: this.mapToFont(this.sliderItem.TagTitleStyle, false),
+            TagMessageFont: this.mapToFont(this.sliderItem.TagMessageStyle, false),
+            ButtonFont: this.mapToFont(this.sliderItem.ButtonStyle, false)
         }
     }
-
     getSliderItemObject(): SliderItem {
         Object.assign(this.sliderItem, this.editSliderItemForm?.value);
         if (this.buttonUrlControl?.value)
@@ -194,16 +197,18 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
         this.sliderItem.OverlayStyle = additionalOverlayStyle + this.opacityCSS;
         this.sliderItem.Animation = this.animSelector?.selectedAnimation != null ? this.animSelector?.selectedAnimation.name : null;
     
-        const fontStr = (font: any) => font? 
-            Object.keys(font)
-                .filter(prop => font[prop] != "undefined")
-                .reduce((acc, str)=> acc += str + ":" + font[str] + ";", ";") 
-            : "";
-        console.log(this.fontFiles.TagTitleFont?.getStyles());
-        console.log(fontStr(this.fontFiles.TagTitleFont?.getStyles()));
-        this.sliderItem.TagTitleStyle = this.editSliderItemForm?.value["TagTitleStyle"] + fontStr(this.fontFiles.TagTitleFont?.getStyles());
-        this.sliderItem.TagMessageStyle = this.editSliderItemForm?.value["TagMessageStyle"] + fontStr(this.fontFiles.TagMessageFont?.getStyles());
-        this.sliderItem.ButtonStyle = this.editSliderItemForm?.value["ButtonStyle"] + fontStr(this.fontFiles.ButtonFont?.getStyles()); 
+        const fontStr = (font: Font|undefined) => {
+            if(font !== undefined){
+                const style = font.getStyles();
+                return Object.keys(style)
+                .filter(prop => style[prop] != "undefined")
+                .reduce((acc, str)=> acc += str + ":" + style[str] + ";", ";");
+            } 
+            return "";
+        };
+        this.sliderItem.TagTitleStyle = this.editSliderItemForm?.value["TagTitleStyle"] + fontStr(this.selectedFonts.TagTitleFont);
+        this.sliderItem.TagMessageStyle = this.editSliderItemForm?.value["TagMessageStyle"] + fontStr(this.selectedFonts.TagMessageFont);
+        this.sliderItem.ButtonStyle = this.editSliderItemForm?.value["ButtonStyle"] + fontStr(this.selectedFonts.ButtonFont); 
         this.sliderChange.emit(this.slider);
         return this.sliderItem;
     }

@@ -33,21 +33,16 @@
             <div class="uk-margin">
                 <label class="uk-form-label" for="txtTagTitle">Slide Title:</label>
                 <div class="uk-form-controls uk-inline uk-width-1-1">
-                    <a class="uk-form-icon sonet-form-icon" [(fontPicker)]="fontFiles.TagTitleFont" [fpWidth]="'320px'" [fpPosition]="'bottom'" [fpDialogDisplay]="'popup'">
-                        <i class="fa fa-font"></i>
-                    </a>
+                    <app-font-selector class="sonet-font-selector" [(font)]="selectedFonts.TagTitleFont"></app-font-selector>
                     <input id="txtTagTitle" formControlName="TagTitle" type="text" placeholder="enter slide title"
                         class="uk-input">
                     <span class="uk-text-muted uk-text-small">Prominent slide title</span>
                 </div>
             </div>
-
             <div class="uk-margin">
                 <label class="uk-form-label" for="txtTagMessage">Slide Sub-Title:</label>
                 <div class="uk-form-controls uk-inline uk-width-1-1">
-                    <a class="uk-form-icon sonet-form-icon" [(fontPicker)]="fontFiles.TagMessageFont" [fpWidth]="'320px'" [fpPosition]="'bottom'" [fpDialogDisplay]="'popup'">
-                        <i class="fa fa-font"></i>
-                    </a>
+                    <app-font-selector class="sonet-font-selector" [(font)]="selectedFonts.TagMessageFont"></app-font-selector>
                     <input class="uk-input" id="txtTagMessage" formControlName="TagMessage"
                         placeholder="enter slide sub-title">
                 </div>
@@ -57,10 +52,8 @@
             <div class="uk-margin">
                 <label class="uk-form-label" for="txtButtonText">Button Text:</label>
                 <div class="uk-form-controls uk-inline uk-width-1-1">
-                    <a class="uk-form-icon sonet-form-icon" [(fontPicker)]="fontFiles.ButtonFont" [fpWidth]="'320px'" [fpPosition]="'bottom'" [fpDialogDisplay]="'popup'">
-                        <i class="fa fa-font"></i>
-                    </a>
-                    <input id="txtButtonText" formControlName="ButtonText" type="text"
+                    <app-font-selector class="sonet-font-selector" [(font)]="selectedFonts.ButtonFont"></app-font-selector>
+                     <input id="txtButtonText" formControlName="ButtonText" type="text"
                         placeholder="enter text for a button" class="uk-input">
                     <span class="uk-text-muted uk-text-small">Text for a button when one is needed</span>
                 </div>
