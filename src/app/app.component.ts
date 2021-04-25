@@ -6,6 +6,8 @@ import { SliderItem } from "./models/sliderItem";
 import { EditSliderItemComponent } from "./edit-slider-item/edit-slider-item.component";
 import { MessageService } from 'primeng/api';
 import { SoNetAppConfig } from "./sonetapp.config";
+import { Font } from "ngx-font-picker";
+import {toFontTag, toFontUrl} from './models/font';
 
 declare var $: any;
 
@@ -108,14 +110,14 @@ export class AppComponent {
             return;
         if (!siteName)
             throw new Error('Invalid siteName while saving fonts.');
-        const toFontTag = (fontUrl: string) => ` <link href='${fontUrl}' rel='stylesheet' type='text/css'>`;
+        
         const fonts = Object.keys(fontFiles)
             .map(prop => fontFiles[prop])
             .filter(font=> font!=undefined)
-            .filter(font => font.files)
-            .map(font => font.files[font.style]);
+            .filter(font => font.files);
+            console.log(fonts);
         if (fonts && fonts.length > 0)
-            await this.apiClient.updateSeoScripts(siteName, fonts.map(t => toFontTag(t)).join('\n'));        
+            await this.apiClient.updateSeoScripts(siteName, fonts.map(toFontUrl).map(t => toFontTag(t)).join('\n'));        
     }
 
 

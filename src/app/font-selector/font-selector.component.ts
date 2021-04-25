@@ -18,14 +18,14 @@ export class FontSelectorComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
+    if(this.font){
+      this.selectorFont = new Font(this.font);
+    }
   }
 
   selectFont(){
-    console.log(this.selectorFont);
     if(this.selectorFont){
       this.font = new Font(this.selectorFont);
-      console.log(this.selectorFont);
-      console.log(this.font);
       this.fontChange.emit(this.font);
       this.fontpicker.closeDialog();
     }

@@ -130,14 +130,14 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
             clearInterval(this.videoProcessingInterval);
     }
     private styleValue(style: string): string[]{
-      return style.split(";").filter(t=>t && t.indexOf("font")==-1);
+      return style?.split(";").filter(t=>t && t.indexOf("font")==-1);
     }
     private fontValue(style: string): string[]{
-      return style.split(";").filter(t=>t && t.indexOf("font")!=-1);
+      return style?.split(";").filter(t=>t && t.indexOf("font")!=-1);
     }
     private mapToFont(style: string, usedefault: boolean): Font | undefined{
         const font_value = this.fontValue(style);
-        if(!usedefault && !font_value.length) return undefined;
+        if(!usedefault && !font_value?.length) return undefined;
         var font = new Font({   //default
             family: 'Roboto',
             size: '14px',
@@ -158,7 +158,7 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
         const pre_style = font_dict['weight'] == "normal"
                 ? post_style == '' ? 'regular' : '' 
             : font_dict['weight'];
-        font.style = pre_style + post_style;
+        font.style = pre_style + "" + post_style;
         return font;
     }
 
@@ -199,6 +199,7 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
     
         const fontStr = (font: Font|undefined) => {
             if(font !== undefined){
+                console.log(font);
                 const style = font.getStyles();
                 return Object.keys(style)
                 .filter(prop => style[prop] != "undefined")
