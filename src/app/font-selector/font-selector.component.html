@@ -10,7 +10,7 @@
         <i class="fa fa-font"></i>
         <p>{{getFontLabel()}}</p> 
     </a>
-    <div class="uk-inline">
+    <div class="uk-inline" *ngIf="font">
         <span class="uk-form-icon uk-form-icon-flip">{{sizelabel}}</span>        
         <input class="uk-input" type="number" placeholder="size" [(ngModel)]="fontSize" (ngModelChange)="selectFont()">
     </div>
