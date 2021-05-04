@@ -1,5 +1,7 @@
 import { Font } from 'ngx-font-picker';
 
+export const fontLabels = ['font-style', 'font-family', 'font-weight', 'font-size'];
+
 export interface FontFiles{
     TagTitleFont?: Font;
     TagMessageFont?: Font;

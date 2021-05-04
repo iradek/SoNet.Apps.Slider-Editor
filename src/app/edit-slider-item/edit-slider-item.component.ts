@@ -3,7 +3,7 @@ import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { SliderItem } from "../models/sliderItem";
 import { Slider } from "../models/slider";
 import { SlideAnimations } from '../models/slideAnimation';
-import { FontFiles } from '../models/font';
+import { FontFiles, fontLabels } from '../models/font';
 import { AnimSelectorComponent } from '../anim-selector/anim-selector.component';
 import { SliderApiClient } from '../services/sliderApiClient';
 import { SoNetUrlService } from "@iradek/sonet-appskit";
@@ -130,13 +130,15 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
             clearInterval(this.videoProcessingInterval);
     }
     private styleValue(style: string): string[]{
-      return style?.split(";").filter(t=>t && t.indexOf("font")==-1);
+      return style?.split(";").filter(t=>t && !fontLabels.includes(t.split(':')[0]));
     }
     private fontValue(style: string): string[]{
-      return style?.split(";").filter(t=>t && t.indexOf("font")!=-1);
+        console.log(style);
+      return style?.split(";").filter(t=>t && fontLabels.includes(t.split(':')[0]));
     }
     private mapToFont(style: string, usedefault: boolean): Font | undefined{
         const font_value = this.fontValue(style);
+        console.log(font_value);
         if(!usedefault && !font_value?.length) return undefined;
         var font = new Font({   //default
             family: 'Roboto',

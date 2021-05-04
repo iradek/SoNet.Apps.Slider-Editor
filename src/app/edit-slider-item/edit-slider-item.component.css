@@ -18,5 +18,6 @@ fieldset { margin: 0 !important; }
     font-weight: 600;
 }
 .sonet-font-selector~.uk-input {
-    margin-left: 155px!important;
+    margin-left: 266px!important;
+    width: calc(100% - 266px);
 }
