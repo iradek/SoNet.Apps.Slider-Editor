@@ -7,31 +7,7 @@
     margin-top: .5em;
     margin-bottom: .2em;
 }
-.sonet-font-selector-wrapper{
-    padding-left: 4px;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    display: inline-flex;
-    align-items: center;
-    height: 41px;
-}
-.sonet-font-selector-wrapper>div{
-    width: 105px;
-}
-.sonet-font-selector{
-    width: 150px;  
-    overflow: hidden;
-    display: inline-flex;
-    align-items: center;
-    color: #999;
-}
-.sonet-font-selector>i{
-    margin-right: 5px;
-}
-.sonet-font-selector>p{
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
+
+.sonet-font-size-selector {
+    width: 4em;
 }

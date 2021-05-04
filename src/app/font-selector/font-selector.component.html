@@ -1,20 +1,17 @@
-<div class="sonet-font-selector-wrapper">
-    <a class="sonet-font-selector" [(fontPicker)]="selectorFont" 
-        #fontSelector
-        [fpWidth]="'320px'" [fpPosition]="'bottom'" 
-        [fpSizeSelect]=false
-        [fpDialogDisplay]="'popup'" [fpCancelButton]=true 
-        [fpUploadButton]=true (fontPickerUpload)="selectFont()" 
-        [fpUploadButtonClass]="'uk-button uk-button-primary'" [fpUploadButtonText]="'Select'" 
-        [fpCancelButtonClass]="'uk-button'">
-        <i class="fa fa-font"></i>
-        <p>{{getFontLabel()}}</p> 
-    </a>
-    <div class="uk-inline" *ngIf="font">
-        <span class="uk-form-icon uk-form-icon-flip">{{sizelabel}}</span>        
-        <input class="uk-input" type="number" placeholder="size" [(ngModel)]="fontSize" (ngModelChange)="selectFont()">
+<div data-uk-grid class="uk-flex-middle">
+    <div>
+        <a class="uk-text-muted" [(fontPicker)]="selectorFont" #fontSelector [fpWidth]="'320px'"
+            [fpPosition]="'bottom'" [fpSizeSelect]=false [fpDialogDisplay]="'popup'" [fpCancelButton]=true
+            [fpUploadButton]=true (fontPickerUpload)="selectFont()"
+            [fpUploadButtonClass]="'uk-button uk-button-primary'" [fpUploadButtonText]="'Select'"
+            [fpCancelButtonClass]="'uk-button'">
+            <span class="fa fa-font uk-text-emphasis uk-margin-small-right" aria-hidden="true"></span>
+            <label>{{getFontLabel()}}</label>
+        </a>
+    </div>    
+    <div [hidden]="!font">
+        <span class="fa fa-text-width uk-text-emphasis uk-margin-small-right" aria-hidden="true"></span>
+        <input class="uk-input sonet-font-size-selector" type="number" placeholder="size"
+            [(ngModel)]="fontSize" (ngModelChange)="selectFont()">
     </div>
-    <!-- <div class="uk-form-controls uk-inline uk-width-1-1"> -->
-        <!-- <input class="uk-input" type="number" placeholder="Font size"> -->
-    <!-- </div> -->
 </div>
