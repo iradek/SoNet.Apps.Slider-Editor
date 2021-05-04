@@ -23,7 +23,7 @@ export class FontSelectorComponent implements OnInit {
   ngOnInit(): void {
     if(this.font){
       this.selectorFont = new Font(this.font);
-      this.fontSize = Number.parseInt(this.selectorFont.size);
+      this.fontSize = Number.parseFloat(this.selectorFont.size);
     }else{
       this.fontSize = this.defaultFontSize;
     }

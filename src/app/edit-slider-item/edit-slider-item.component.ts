@@ -133,12 +133,10 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
       return style?.split(";").filter(t=>t && !fontLabels.includes(t.split(':')[0]));
     }
     private fontValue(style: string): string[]{
-        console.log(style);
       return style?.split(";").filter(t=>t && fontLabels.includes(t.split(':')[0]));
     }
     private mapToFont(style: string, usedefault: boolean): Font | undefined{
         const font_value = this.fontValue(style);
-        console.log(font_value);
         if(!usedefault && !font_value?.length) return undefined;
         var font = new Font({   //default
             family: 'Roboto',
@@ -201,7 +199,6 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
     
         const fontStr = (font: Font|undefined) => {
             if(font !== undefined){
-                console.log(font);
                 const style = font.getStyles();
                 return Object.keys(style)
                 .filter(prop => style[prop] != "undefined")
