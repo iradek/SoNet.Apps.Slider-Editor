@@ -1,0 +1,11 @@
+{
+    "api_baseUrl": "[change]",
+    "oauth_client_id": "[change]",
+    "oauth_client_secret": "[change]",
+    "oAuthGrant": "ResourceOwner",
+    "siteName": "[change]",
+    "userName": "[change]",
+    "userPassword": "[change]",
+    "passwordAlreadyEncrypted": false,    
+    "logging": false
+}

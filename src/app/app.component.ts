@@ -6,8 +6,6 @@ import { SliderItem } from "./models/sliderItem";
 import { EditSliderItemComponent } from "./edit-slider-item/edit-slider-item.component";
 import { MessageService } from 'primeng/api';
 import { SoNetAppConfig } from "./sonetapp.config";
-import { Font } from "ngx-font-picker";
-import {toFontTag, toFontUrl} from './models/font';
 
 declare var $: any;
 
@@ -54,9 +52,6 @@ export class AppComponent {
         //save Slider
         let savedSlider = await this.apiClient.saveOrUpdateSliderAsync(this.currentSlider);
         this.currentSlider.SliderID = savedSlider.SliderID;
-        let currentSite = await this.apiClient.getSiteAsync();
-        if (!currentSite)
-            throw new Error("Current Site is null which is not supported while saving a Slider.");
 
         //save Slider Items
         let index: number = 0;
@@ -74,19 +69,21 @@ export class AppComponent {
                 else
                     editSliderControl.resetImage();
             }
-            await this.saveFontsAsync(editSliderControl.selectedFonts, currentSite.SiteName);
             let validSliderItemVideoToUpload = editSliderControl.dirty && editSliderControl.videodata;
             if (validSliderItemVideoToUpload) {
                 if (this.ensureFileSize(editSliderControl.videodata.length, sliderItem))
                     savedSliderItem = await this.apiClient.uploadSliderItemVideoAsync(savedSliderItem.SliderItemID, editSliderControl.videodata);
                 else
                     editSliderControl.resetVideo();
-                }
+            }
             editSliderControl.sliderItem = savedSliderItem; //let it know so it can update instead of creating a new one
             this.currentSlider.SliderItemList[index] = savedSliderItem; //keep currentSlider.SliderItemList up to date as well (e.g. currentSlider.SliderItemList[index].SliderItemID is important for deleting later).
             index++;
         }
-        //associate with a Site       
+        //associate with a Site
+        let currentSite = await this.apiClient.getSiteAsync();
+        if (!currentSite)
+            throw new Error("Current Site is null which is not supported while saving a Slider.");
         await this.apiClient.saveSliderForSiteAsync(currentSite.SiteName, savedSlider.SliderID);
         this.messageService.add({ severity: "success", summary: "Success", detail: "Slider saved sucessfully. Refreshing the page..." });
     }
@@ -104,22 +101,6 @@ export class AppComponent {
             alert(`Your file for slider #${(sliderItem.Order || 0) + 1} exceeds maximum allowed file size. Please pick a smaller file.`);
         return isFileSizeOk;
     }
-
-    private async saveFontsAsync(fontFiles: any, siteName: string) {
-        if (!fontFiles)
-            return;
-        if (!siteName)
-            throw new Error('Invalid siteName while saving fonts.');
-        
-        const fonts = Object.keys(fontFiles)
-            .map(prop => fontFiles[prop])
-            .filter(font=> font!=undefined)
-            .filter(font => font.files);
-            console.log(fonts);
-        if (fonts && fonts.length > 0)
-            await this.apiClient.updateSeoScripts(siteName, fonts.map(toFontUrl).map(t => toFontTag(t)).join('\n'));        
-    }
-
 
     async deleteSliderItem(index: number) {
         const deletedSliderItems = this.currentSlider.SliderItemList.splice(index, 1);

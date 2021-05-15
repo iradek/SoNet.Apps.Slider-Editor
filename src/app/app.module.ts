@@ -16,18 +16,10 @@ import { SoNetAppsKitModule, SoNetConfigService } from '@iradek/sonet-appskit';
 import { SliderApiClient } from './services/sliderApiClient';
 import { UtilsService } from './services/utils.service';
 import { SoNetAppConfig } from './sonetapp.config';
-import { FontPickerConfigInterface, FontPickerModule, FONT_PICKER_CONFIG } from 'ngx-font-picker';
-import { environment } from 'src/environments/environment';
 import { ImageCropperModule } from 'ngx-image-cropper';
-import { FontSelectorComponent } from './font-selector/font-selector.component';
-
-const DEFAULT_FONT_PICKER_CONFIG: FontPickerConfigInterface = {
-    // Change this to your Google API key
-    apiKey: environment.apiKey
-};
 
 @NgModule({
-  declarations: [AppComponent, EditSlider, EditSliderItemComponent, AnimSelectorComponent, FontSelectorComponent],
+  declarations: [AppComponent, EditSlider, EditSliderItemComponent, AnimSelectorComponent],
   imports: [
     BrowserModule,    
     BrowserAnimationsModule,
@@ -38,17 +30,12 @@ const DEFAULT_FONT_PICKER_CONFIG: FontPickerConfigInterface = {
     AccordionModule,    
     ToastModule,
     SliderModule,
-    FontPickerModule,    
     ImageCropperModule
   ],
   providers: [SliderApiClient, UtilsService, MessageService,
     {
       provide: SoNetConfigService,
       useClass: SoNetAppConfig
-    },
-    {
-      provide: FONT_PICKER_CONFIG,
-      useValue: DEFAULT_FONT_PICKER_CONFIG
     }
   ],
   bootstrap: [AppComponent]
