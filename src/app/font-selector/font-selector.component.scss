@@ -8,6 +8,12 @@
     margin-bottom: .2em;
 }
 
+::ng-deep .font-name {
+    font-size: x-large !important;
+}
+
 .sonet-font-size-selector {
     width: 4em;
 }
+
+::ng-deep .font-picker { box-shadow: 0 14px 25px rgb(0 0 0 / 16%) }
