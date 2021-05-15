@@ -3,9 +3,11 @@ import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { SliderItem } from "../models/sliderItem";
 import { Slider } from "../models/slider";
 import { SlideAnimations } from '../models/slideAnimation';
+import { FontFiles, fontLabels } from '../models/font';
 import { AnimSelectorComponent } from '../anim-selector/anim-selector.component';
 import { SliderApiClient } from '../services/sliderApiClient';
 import { SoNetUrlService } from "@iradek/sonet-appskit";
+import { Font } from 'ngx-font-picker';
 import { ImageCroppedEvent, ImageCropperComponent } from 'ngx-image-cropper';
 import { Rectangle } from '../models/rectangle';
 
@@ -41,6 +43,8 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
         }
     };
 
+    selectedFonts: FontFiles;
+    selectorFonts: FontFiles;
     txtButtonUrl_placeholder = this.resolveSchemaPlaceholder(this.additionalProperties.uriSchema);
     /**
      * When true - it contains an image or video that needs to be uploaded.
@@ -125,6 +129,38 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
         if (this.videoProcessingInterval)
             clearInterval(this.videoProcessingInterval);
     }
+    private styleValue(style: string): string[]{
+      return style?.split(";").filter(t=>t && !fontLabels.includes(t.split(':')[0]));
+    }
+    private fontValue(style: string): string[]{
+      return style?.split(";").filter(t=>t && fontLabels.includes(t.split(':')[0]));
+    }
+    private mapToFont(style: string, usedefault: boolean): Font | undefined{
+        const font_value = this.fontValue(style);
+        if(!usedefault && !font_value?.length) return undefined;
+        var font = new Font({   //default
+            family: 'Roboto',
+            size: '14px',
+            style: 'regular',
+            styles: ['regular']
+        });
+        
+        var font_dict: {[prop: string]: string} = {};
+        font_value.map(val=>{
+            return {
+              value: val.split(':')[1].trim(),
+              prop: val.split(':')[0].replace('font-', '').trim()
+            };
+          }).forEach(val=> font_dict[val.prop] = val.value);
+        font.family = font_dict['family'];
+        font.size = font_dict['size'];
+        const post_style = font_dict['style'] == "normal"? '' : font_dict['style'];
+        const pre_style = font_dict['weight'] == "normal"
+                ? post_style == '' ? 'regular' : '' 
+            : font_dict['weight'];
+        font.style = pre_style + "" + post_style;
+        return font;
+    }
 
     private resolveSchemaPlaceholder(schema: string) {
         if (!schema)
@@ -140,14 +176,19 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
             "TagMessage": [this.sliderItem.TagMessage, []],
             "ButtonText": [this.sliderItem.ButtonText, []],
             "ButtonUrl": [],
-            "TagTitleStyle": [this.sliderItem.TagTitleStyle, []],
-            "TagMessageStyle": [this.sliderItem.TagMessageStyle, []],
-            "ButtonStyle": [this.sliderItem.ButtonStyle, []],
-            "OverlayStyle": []
+            "TagTitleStyle": [this.styleValue(this.sliderItem.TagTitleStyle), []],
+            "TagMessageStyle": [this.styleValue(this.sliderItem.TagMessageStyle), []],
+            "ButtonStyle": [this.styleValue(this.sliderItem.ButtonStyle), []],
+            "OverlayStyle": [],
             //"Muted": [this.sliderItem.Muted, []]
         });
+        
+        this.selectedFonts = {
+            TagTitleFont: this.mapToFont(this.sliderItem.TagTitleStyle, false),
+            TagMessageFont: this.mapToFont(this.sliderItem.TagMessageStyle, false),
+            ButtonFont: this.mapToFont(this.sliderItem.ButtonStyle, false)
+        }
     }
-
     getSliderItemObject(): SliderItem {
         Object.assign(this.sliderItem, this.editSliderItemForm?.value);
         if (this.buttonUrlControl?.value)
@@ -155,6 +196,19 @@ export class EditSliderItemComponent implements OnInit, OnDestroy {
         const additionalOverlayStyle: string = this.overlayStyleControl?.value || "";
         this.sliderItem.OverlayStyle = additionalOverlayStyle + this.opacityCSS;
         this.sliderItem.Animation = this.animSelector?.selectedAnimation != null ? this.animSelector?.selectedAnimation.name : null;
+    
+        const fontStr = (font: Font|undefined) => {
+            if(font !== undefined){
+                const style = font.getStyles();
+                return Object.keys(style)
+                .filter(prop => style[prop] != "undefined")
+                .reduce((acc, str)=> acc += str + ":" + style[str] + ";", ";");
+            } 
+            return "";
+        };
+        this.sliderItem.TagTitleStyle = this.editSliderItemForm?.value["TagTitleStyle"] + fontStr(this.selectedFonts.TagTitleFont);
+        this.sliderItem.TagMessageStyle = this.editSliderItemForm?.value["TagMessageStyle"] + fontStr(this.selectedFonts.TagMessageFont);
+        this.sliderItem.ButtonStyle = this.editSliderItemForm?.value["ButtonStyle"] + fontStr(this.selectedFonts.ButtonFont); 
         this.sliderChange.emit(this.slider);
         return this.sliderItem;
     }
